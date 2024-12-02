@@ -1,7 +1,6 @@
-import { IEntity } from "./interface";
-import { Container } from "pixi.js/lib/scene/container/Container";
+import { IEntity } from "./interfaces";
 import { PointData } from "pixi.js/lib/maths/point/PointData";
-import { StepParams } from "./types";
+import { Container } from "pixi.js/lib/scene/container/Container";
 
 export default abstract class Entity implements IEntity {
   protected x: number;
@@ -9,15 +8,19 @@ export default abstract class Entity implements IEntity {
 
   abstract size: number;
   abstract img: Container;
-  abstract step(params: StepParams): void;
 
-  constructor({ x, y }: PointData) {
+  constructor({ x, y }: PointData = { x: 0, y: 0 }) {
     this.x = x;
     this.y = y;
   }
 
   get point(): PointData {
     return { x: this.x, y: this.y };
+  }
+
+  renderTo(container: Container): void {
+    this.syncImg();
+    container.addChild(this.img);
   }
 
   syncImg(): void {

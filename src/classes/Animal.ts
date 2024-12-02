@@ -1,17 +1,16 @@
 import MovingEntity from "../models/MovingEntity";
 import PIXI, { Graphics } from "pixi.js";
 import { PointData } from "pixi.js/lib/maths/point/PointData";
-import { IAnimal } from "../models/interface";
+import { FromTo, IAnimal } from "../models/interfaces";
 import Rnd from "../lib/Rnd";
-import { FromTo } from "../models/types";
 
 export default class Animal extends MovingEntity implements IAnimal {
-  private readonly sizeRange: FromTo<number> = { from: 20, to: 30 };
+  private readonly sizeVariance: FromTo<number> = { from: 20, to: 30 };
 
   readonly size: number = this.pickSize();
-  readonly velocity: number = this.getVelocity();
-  readonly alertVelocity: number = this.velocity + 100;
-  readonly followVelocity: number = this.velocity + 50;
+  readonly baseSpeed: number = this.calcSpeed();
+  readonly alertSpeed: number = this.baseSpeed + 100;
+  readonly followSpeed: number = this.baseSpeed + 50;
   readonly alertRange: number = this.getAlertRange();
   readonly img: Graphics;
 
@@ -19,8 +18,8 @@ export default class Animal extends MovingEntity implements IAnimal {
   isDodging: boolean = false;
   hasCollision: boolean = false;
 
-  constructor(pos: PointData) {
-    super(pos);
+  constructor(position: PointData) {
+    super(position);
     this.img = new PIXI.Graphics()
       .circle(this.size, this.size, this.size)
       .fill(0xffffff)
@@ -30,12 +29,12 @@ export default class Animal extends MovingEntity implements IAnimal {
   }
 
   private pickSize(): number {
-    return Rnd.val(this.sizeRange.from, this.sizeRange.to, 1);
+    return Rnd.val(this.sizeVariance.from, this.sizeVariance.to, 1);
   }
 
-  private getVelocity(): number {
+  private calcSpeed(): number {
     const ratio: number = 5;
-    return (this.sizeRange.from + this.sizeRange.to - this.size) * ratio;
+    return (this.sizeVariance.from + this.sizeVariance.to - this.size) * ratio;
   }
 
   private getAlertRange(): number {

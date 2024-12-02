@@ -1,5 +1,5 @@
 import { PointData } from "pixi.js/lib/maths/point/PointData";
-import { MotionData } from "../models/types";
+import { MotionData } from "../models/interfaces";
 
 class Maths {
   round(value: number, precision: number = 0): number {

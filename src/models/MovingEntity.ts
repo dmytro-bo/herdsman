@@ -1,17 +1,22 @@
-import { IMovingEntity } from "./interface";
+import {
+  IMovingEntity,
+  MotionData,
+  MoveParams,
+  Speed,
+  TickParams,
+} from "./interfaces";
 import Entity from "./Entity";
 import { PointData } from "pixi.js/lib/maths/point/PointData";
 import Maths from "../lib/Maths";
-import { MotionData, MoveParams, Speed, StepParams } from "./types";
 
 export default abstract class MovingEntity
   extends Entity
   implements IMovingEntity
 {
-  abstract readonly velocity: number;
+  abstract readonly baseSpeed: number;
 
-  protected v: number = 0;
-  protected moveData: MotionData = this.distanceTo({ x: this.x, y: this.y });
+  private v: number = 0;
+  private moveData: MotionData = this.distanceTo({ x: this.x, y: this.y });
 
   get info(): MotionData & Speed {
     return { ...this.moveData, v: this.v };
@@ -26,7 +31,7 @@ export default abstract class MovingEntity
     this.moveTo({ x: this.x + x, y: this.y + y, v });
   }
 
-  step({ deltaMs }: StepParams): void {
+  tick({ deltaMs }: TickParams): void {
     if (!this.v) return;
 
     const v: number = this.v;
@@ -43,9 +48,11 @@ export default abstract class MovingEntity
       this.x += s * distance.cos;
       this.y += s * distance.sin;
     }
+
+    this.syncImg();
   }
 
-  distanceTo({ x, y }: PointData): MotionData {
+  private distanceTo({ x, y }: PointData): MotionData {
     return Maths.distance(this.point, { x, y });
   }
 }

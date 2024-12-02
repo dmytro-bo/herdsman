@@ -1,4 +1,6 @@
 import { Game } from "./classes/Game";
 import "./index.css";
 
-new Game();
+const game = new Game();
+
+game.init();

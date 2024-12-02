@@ -1,7 +1,12 @@
-import { IAnimal, IGame } from "../models/interface";
+import {
+  IAnimal,
+  IGame,
+  MotionData,
+  MoveParams,
+  TickParams,
+} from "../models/interfaces";
 import Maths from "./Maths";
 import Rnd from "./Rnd";
-import { MotionData, MoveParams, StepParams } from "../models/types";
 
 const chanceToRoam: number = 1;
 const dodgeConfig = {
@@ -10,10 +15,11 @@ const dodgeConfig = {
   angleCos: Math.cos(Math.PI / 3),
 };
 
-class HerdHelper {
+class FieldHelper {
   caughtItems: Set<IAnimal> = new Set();
 
-  processStep(items: IAnimal[], game: IGame, params: StepParams): void {
+  processTick(items: Set<IAnimal>, params: TickParams): void {
+    const { game } = params;
     items.forEach((item: IAnimal): void => {
       item.hasCollision = false;
     });
@@ -33,9 +39,7 @@ class HerdHelper {
       }
     });
 
-    items.forEach((item: IAnimal): void => {
-      item.step(params);
-    });
+    items.forEach((item: IAnimal): void => item.tick(params));
   }
 
   private dodgeHerdsman(item: IAnimal, { herdsman }: IGame): void {
@@ -62,13 +66,13 @@ class HerdHelper {
       const moveShift: MoveParams =
         Math.abs(diffAngleSin) > dodgeConfig.angleSin
           ? { x: delta.x, y: delta.y }
-          : this.getDodgeShift(range, sinH, cosH, diffAngleSin < 0); //  avoid the chase
+          : this.getDodgeShift(range, sinH, cosH, diffAngleSin < 0); // avoid the chase
 
-      item.moveBy({ ...moveShift, v: item.alertVelocity });
+      item.moveBy({ ...moveShift, v: item.alertSpeed });
     }
   }
 
-  private avoidCollisions(item: IAnimal, comparedItems: IAnimal[]): void {
+  private avoidCollisions(item: IAnimal, comparedItems: Set<IAnimal>): void {
     comparedItems.forEach((comparedItem: IAnimal): void => {
       if (comparedItem === item) return;
 
@@ -84,7 +88,7 @@ class HerdHelper {
         item.moveBy({
           x: -delta.x * scale1,
           y: -delta.y * scale1,
-          v: item.velocity,
+          v: item.baseSpeed,
         });
 
         const scale2: number = this.rndScale(10);
@@ -92,7 +96,7 @@ class HerdHelper {
         comparedItem.moveBy({
           x: delta.x * scale2,
           y: delta.y * scale2,
-          v: item.velocity,
+          v: item.baseSpeed,
         });
       }
     });
@@ -110,16 +114,23 @@ class HerdHelper {
       item.moveBy({
         x: -delta.x,
         y: -delta.y,
-        v: item.alertVelocity,
+        v: item.alertSpeed,
       });
     } else {
-      item.moveTo({ ...herdsman.point, v: item.followVelocity });
+      item.moveTo({ ...herdsman.point, v: item.followSpeed });
     }
   }
 
-  private checkYard(item: IAnimal, { yard }: IGame): void {
+  private checkYard(item: IAnimal, { yard, field }: IGame): void {
     const { abs }: MotionData = Maths.distance(item.point, yard.point);
-    const hasEntered: boolean = abs <= yard.size - item.size;
+    const hasEntered: boolean =
+      item.isCaught && abs <= yard.size - item.size / 2;
+
+    if (hasEntered) {
+      this.caughtItems.delete(item);
+      yard.addScore();
+      field.removeItem(item);
+    }
   }
 
   private roamAround(item: IAnimal, game: IGame): void {
@@ -127,8 +138,8 @@ class HerdHelper {
 
     if (isTriggered) {
       item.moveTo({
-        ...game.rndPos(),
-        v: item.velocity,
+        ...game.field.rndPoint(),
+        v: item.baseSpeed,
       });
     }
   }
@@ -153,4 +164,4 @@ class HerdHelper {
   }
 }
 
-export default new HerdHelper();
+export default new FieldHelper();
