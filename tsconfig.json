@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "lib": ["esnext", "dom"],
+    "rootDirs": ["./src"],
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "target": "es6",
+    "module": "commonjs",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowJs": true,
+    "noUnusedLocals": false,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src/**/*"],
+  "$schema": "https://json.schemastore.org/tsconfig"
+}
