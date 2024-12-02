@@ -1,4 +1,4 @@
-import PIXI, { Application, Graphics, Texture, Ticker } from "pixi.js";
+import PIXI, { Application, Texture, Ticker } from "pixi.js";
 import Yard from "./Yard";
 import Field from "./Field";
 import Herdsman from "./Herdsman";

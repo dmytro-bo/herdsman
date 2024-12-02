@@ -7,7 +7,6 @@ import {
 } from "../models/interfaces";
 import Maths from "./Maths";
 import Rnd from "./Rnd";
-import PIXI, { Graphics } from "pixi.js";
 
 const chanceToRoam: number = 1;
 const dodgeConfig = {

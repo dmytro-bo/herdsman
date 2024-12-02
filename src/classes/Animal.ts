@@ -1,6 +1,5 @@
 import MovingEntity from "../models/MovingEntity";
 import PIXI, { Graphics } from "pixi.js";
-import { PointData } from "pixi.js/lib/maths/point/PointData";
 import { FromTo, IAnimal } from "../models/interfaces";
 import Rnd from "../lib/Rnd";
 
