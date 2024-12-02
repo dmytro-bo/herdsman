@@ -1,13 +1,17 @@
 # herdsman
 
-Demo game for technical task
+Demo game for technical task.
 
-Aim: catch'em and bring to yard.
+Aim: catch'em and bring to the yard.
 
-Description
+You are twice faster, but would it be enough?
+
+## Description
+
 Please create a simple 2D prototype of the mini-game where the player can collect animals using
 Main Hero and move them to the destination point (yard).
-AC:
+
+### AC:
 
 1. Player run the application and can see the game field (green area) with Main Hero (red
    circle).
@@ -28,7 +32,8 @@ AC:
 11. Engines or renderings libraries: PixiJs is preferable. Please avoid using frameworks
     (Vue.js/React/Angular)
 
-Assets
+### Assets
+
 You can use a placeholder graphics or any shared assets.
 What we want to see:
 
@@ -40,5 +45,7 @@ What we want to see:
 3. All points from the AC must be completed.
 4. Points from the Additional (optional) AC can be skipped. But if they will be completed it will
    be a plus.
-   Delivery:
-   Please use Git Hub.
+
+### Delivery:
+
+Please use Git Hub.

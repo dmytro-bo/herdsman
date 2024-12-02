@@ -1,42 +1,44 @@
-import PIXI, { Application, Ticker } from "pixi.js";
+import PIXI, { Application, Graphics, Texture, Ticker } from "pixi.js";
 import Yard from "./Yard";
 import Field from "./Field";
 import Herdsman from "./Herdsman";
 import { PointData } from "pixi.js/lib/maths/point/PointData";
-import { IEntity, IGame } from "../models/interfaces";
+import { ApplicationOptions } from "pixi.js/lib/app/Application";
+import { IGame } from "../models/interfaces";
+
+import herdsman from "../assets/herdsman.webp";
+import animal from "../assets/animal.webp";
+import yard from "../assets/yard.webp";
 
 export class Game implements IGame {
+  assets: Record<string, Texture> = {};
   app: Application;
   field: Field;
   yard: Yard;
   herdsman: Herdsman;
 
-  private width: number;
-  private height: number;
-
   constructor() {
     this.app = new PIXI.Application();
-    this.width = document.documentElement.clientWidth;
-    this.height = document.documentElement.clientHeight;
+    const width: number = document.documentElement.clientWidth;
+    const height: number = document.documentElement.clientHeight;
 
-    this.yard = new Yard({ x: Yard.size / 2, y: Yard.size / 2 });
-    this.herdsman = new Herdsman({ x: this.width / 2, y: this.height / 2 });
+    this.yard = new Yard({ x: Yard.radius / 2, y: Yard.radius / 2 });
+    this.herdsman = new Herdsman({ x: width / 2, y: height / 2 });
     this.field = new Field({
-      width: this.width,
-      height: this.height,
+      width,
+      height,
       onClick: (position: PointData): void =>
         this.herdsman.moveTo({ ...position, v: this.herdsman.baseSpeed }),
     });
+
+    this.init({ width, height }).catch();
   }
 
-  async init(): Promise<void> {
-    await this.app.init({
-      width: this.width,
-      height: this.height,
-    });
-    [this.field, this.yard, this.herdsman].forEach((entity: IEntity): void => {
-      entity.renderTo(this.app.stage);
-    });
+  async init(options: Partial<ApplicationOptions>): Promise<void> {
+    await this.app.init(options);
+    this.assets = await PIXI.Assets.load([herdsman, animal, yard]);
+
+    this.renderEntities();
     document.body.appendChild(this.app.canvas);
     this.run();
   }
@@ -48,5 +50,14 @@ export class Game implements IGame {
       this.field.tick(params);
       this.herdsman.tick(params);
     });
+  }
+
+  private renderEntities(): void {
+    const fieldBackground: Texture = this.app.renderer.generateTexture(
+      this.field.createBackground(),
+    );
+    this.field.applyTexture(fieldBackground).renderTo(this.app.stage);
+    this.yard.applyTexture(this.assets[yard]).renderTo(this.app.stage);
+    this.herdsman.applyTexture(this.assets[herdsman]).renderTo(this.app.stage);
   }
 }

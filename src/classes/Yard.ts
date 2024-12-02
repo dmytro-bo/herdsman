@@ -1,43 +1,41 @@
 import Entity from "../models/Entity";
-import PIXI, { BlurFilter, Text } from "pixi.js";
+import PIXI, { BlurFilter, Graphics, Text, Texture } from "pixi.js";
 import { PointData } from "pixi.js/lib/maths/point/PointData";
 import { IYard } from "../models/interfaces";
-import { Container } from "pixi.js/lib/scene/container/Container";
 
 export default class Yard extends Entity implements IYard {
-  static size: number = 100;
+  static radius: number = 100;
 
-  img: Container;
-  size: number = Yard.size;
+  radius: number = Yard.radius;
 
   private count: number = 0;
   private score: Text;
 
+  fallbackImg: Graphics = new PIXI.Graphics()
+    .circle(this.radius, this.radius, this.radius)
+    .fill(0xffff00)
+    .stroke({ color: 0xc0c000, width: 2 });
   constructor(position: PointData) {
     super(position);
     this.score = new PIXI.Text({
       text: this.count,
-      anchor: 0.4,
-      x: this.size,
-      y: this.size,
+      anchor: 0.5,
+      x: this.radius,
+      y: this.radius,
       filters: [new BlurFilter({ strength: 2 })],
       style: {
         fontFamily: "Arial",
-        fontSize: 80,
+        fontSize: 72,
         fill: 0x007000,
       },
     });
+  }
 
-    this.img = new PIXI.Container({
-      children: [
-        new PIXI.Graphics()
-          .circle(this.size, this.size, this.size)
-          .fill(0xffff00)
-          .stroke({ color: 0xc0c000, width: 2 }),
-        this.score,
-      ],
-      pivot: { x: this.size, y: this.size },
-    });
+  applyTexture(texture: Texture): this {
+    super.applyTexture(texture);
+
+    this.img.addChild(this.score);
+    return this;
   }
 
   addScore(): void {

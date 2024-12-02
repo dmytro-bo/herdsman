@@ -7,6 +7,7 @@ import {
 } from "../models/interfaces";
 import Maths from "./Maths";
 import Rnd from "./Rnd";
+import PIXI, { Graphics } from "pixi.js";
 
 const chanceToRoam: number = 1;
 const dodgeConfig = {
@@ -52,7 +53,7 @@ class FieldHelper {
 
     const isCaught: boolean =
       this.caughtItems.size < herdsman.capacity &&
-      range < item.size + herdsman.size;
+      range < item.radius + herdsman.radius;
 
     if (isCaught) {
       item.isCaught = true;
@@ -81,7 +82,7 @@ class FieldHelper {
         comparedItem.point,
       );
 
-      const hasCollision: boolean = abs <= item.size + comparedItem.size;
+      const hasCollision: boolean = abs <= item.radius + comparedItem.radius;
       if (hasCollision) {
         const scale1: number = this.rndScale(10);
         item.hasCollision = true;
@@ -108,7 +109,7 @@ class FieldHelper {
       herdsman.point,
     );
 
-    const hasCollision: boolean = abs <= item.size + herdsman.size;
+    const hasCollision: boolean = abs <= item.radius + herdsman.radius;
 
     if (hasCollision) {
       item.moveBy({
@@ -124,7 +125,7 @@ class FieldHelper {
   private checkYard(item: IAnimal, { yard, field }: IGame): void {
     const { abs }: MotionData = Maths.distance(item.point, yard.point);
     const hasEntered: boolean =
-      item.isCaught && abs <= yard.size - item.size / 2;
+      item.isCaught && abs <= yard.radius - item.radius / 2;
 
     if (hasEntered) {
       this.caughtItems.delete(item);

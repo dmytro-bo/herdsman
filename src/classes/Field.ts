@@ -10,14 +10,14 @@ import FieldHelper from "../lib/FieldHelper";
 import Animal from "./Animal";
 import Rnd from "../lib/Rnd";
 import { Container } from "pixi.js/lib/scene/container/Container";
-import PIXI, { FederatedPointerEvent, Graphics } from "pixi.js";
+import PIXI, { FederatedPointerEvent, Graphics, Texture } from "pixi.js";
 import Entity from "../models/Entity";
 import Maths from "../lib/Maths";
 import { PointData } from "pixi.js/lib/maths/point/PointData";
+import animal from "../assets/animal.webp";
 
 export default class Field extends Entity implements IField, ITickable {
-  size: number = 0; // not relevant
-  img: Graphics;
+  radius: number;
   items: Set<IAnimal> = new Set();
 
   private itemsLimit: number = 30;
@@ -28,7 +28,7 @@ export default class Field extends Entity implements IField, ITickable {
     super();
     this.width = width;
     this.height = height;
-    this.img = this.createBackground();
+    this.radius = Math.max(width, height) / 2;
     this.img.eventMode = "static";
     this.img.on("pointerdown", (event: FederatedPointerEvent): void =>
       onClick({ x: event.x, y: event.y }),
@@ -56,7 +56,12 @@ export default class Field extends Entity implements IField, ITickable {
     return { x: Rnd.val(0, this.width), y: Rnd.val(0, this.height) };
   }
 
-  private createBackground(): Graphics {
+  applyTexture(asset: Texture): this {
+    this.img.addChild(new PIXI.Sprite(asset));
+    return this;
+  }
+
+  createBackground(): Graphics {
     const tileSize: number = 5;
     const pattern = new PIXI.Graphics();
 
@@ -77,7 +82,7 @@ export default class Field extends Entity implements IField, ITickable {
     if (this.items.size < this.itemsLimit && Rnd.chance(chance)) {
       const newItem: IAnimal = new Animal(this.rndPoint());
       this.items.add(newItem);
-      newItem.renderTo(game.app.stage);
+      newItem.applyTexture(game.assets[animal]).renderTo(game.app.stage);
     }
   }
 }

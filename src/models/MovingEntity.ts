@@ -49,7 +49,7 @@ export default abstract class MovingEntity
       this.y += s * distance.sin;
     }
 
-    this.syncImg();
+    this.syncImgPosition();
   }
 
   private distanceTo({ x, y }: PointData): MotionData {
